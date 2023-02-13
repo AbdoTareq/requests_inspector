@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,9 @@ Future<List<Post>> fetchPostsGraphQlUsingInterceptor() async {
       body
     }
     }''');
-  var post = Post.fromMap(response['post']);
+  print(response);
+  var post = Post.fromMap(response['data']['post']);
+  print(post.toMap());
 
   return [post];
 }
@@ -100,7 +103,7 @@ class Post {
   factory Post.fromMap(Map<String, dynamic> map) {
     return Post(
       userId: map['userId']?.toInt() ?? 0,
-      id: map['id']?.toInt() ?? 0,
+      id: int.parse(map['id']),
       title: map['title'] ?? '',
       body: map['body'] ?? '',
     );
