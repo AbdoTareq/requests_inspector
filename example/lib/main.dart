@@ -49,21 +49,20 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
 }
 
 Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
-  final response = await HasuraConnect(
-    'https://graphqlzero.almansi.me/api',
-    interceptors: [HasuraInspectorInterceptor()],
-  ).query('''query {
-    post(id: 1) {
-      id
-      title
-      body
-    }
-    }''');
-  log(response);
-  var post = Post.fromMap(response['data']['post']);
-  log(post.toMap().toString());
+  var headers = {'Content-Type': 'application/json'};
+  final dio = Dio(BaseOptions(
+      connectTimeout: Duration(seconds: 100),
+      receiveTimeout: Duration(seconds: 100),
+      validateStatus: (_) => true))
+    ..interceptors.add(RequestsInspectorInterceptor());
+  var request = await dio.post('http://66.7.221.135:8000/graphql-auth',
+      data:
+          '''{"query":"mutation {\\n  register(name: \\"yasmeen\\", email: \\"yasmeenali@gmail.com\\", password: \\"admin\\", confirm_password: \\"admin\\", phone: \\"0512365478\\", country_id: 1, device_token: \\"123\\", device_type: \\"web\\") {\\n    success\\n    message\\n    data {\\n      id\\n      name\\n      roles_name {\\n        id\\n      }\\n      password\\n      access_token\\n      tokenType\\n      active\\n      groups_ids {\\n        id\\n      }\\n    }\\n  }\\n}","variables":{}}''',
+      options: Options(headers: headers));
 
-  return [post];
+  log(request.data);
+
+  return [Post(userId: 1, id: 1, title: 'title', body: 'body')];
 }
 
 Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
@@ -182,8 +181,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     futurePosts =
-        fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
-    //  fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql(Hasura) Interceptor example */;
+        // fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
+        fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql(Hasura) Interceptor example */;
     //  fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
   }
 

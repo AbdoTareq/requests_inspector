@@ -16,7 +16,10 @@ class RequestsInspectorInterceptor extends Interceptor {
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
         queryParameters: queryParameters,
-        requestBody: response.requestOptions.data,
+        requestBody: response.requestOptions.data
+            .toString()
+            .replaceAll('\\n', ' ')
+            .replaceAll("\\\\", ' '),
         responseBody: response.data,
         sentTime: DateTime.now(),
       ),
